@@ -1,51 +1,33 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 import { addArticle } from "../store/action";
 
-function mapDispatchToProps(dispatch) {
-  return {
-    addArticle: (article) => dispatch(addArticle(article)),
+const mapDispatchToProps = { addArticle };
+
+const ConnectedForm = ({ addArticle }) => {
+  const [title, setTitle] = useState("");
+
+  const handleChange = (event) => {
+    setTitle(event.target.value);
   };
-}
 
-class ConnectedForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      title: "",
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleChange(event) {
-    this.setState({ [event.target.id]: event.target.value });
-  }
-
-  handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    const { title } = this.state;
-    this.props.addArticle({ title });
-    this.setState({ title: "" });
-  }
+    const payload = { title: title };
+    addArticle(payload);
+    setTitle("");
+  };
 
-  render() {
-    const { title } = this.state;
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <div>
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={this.handleChange}
-          />
-        </div>
-      </form>
-    );
-  }
-}
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="title">Title</label>
+        <input type="text" id="title" value={title} onChange={handleChange} />
+      </div>
+      <button type="submit">SAVE</button>
+    </form>
+  );
+};
 
 const Form = connect(null, mapDispatchToProps)(ConnectedForm);
 

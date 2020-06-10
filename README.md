@@ -140,3 +140,127 @@ General Info on mapStateToProps
 
 - Second argument passed in to `connect`, used to dispatch actions to the store
 - The components never access the `store` directly, it is all done through `connect`
+- you can let components dispatch actions in two ways
+  1. a connected component receives `props.dispatch` and can dispatch actions itself
+  2. `connect` can accept an argument `mapDispatchToProps` which lets you create functions that dispatch when called. These functions can be passed as props to a component
+
+### 1. `dispatch` as a prop
+
+- If you use `dispatch` as a prop, do not specify the second argument to `conneect()`
+
+```
+connect(mapStateToProps /** no second argument **/) (CounterComponent);
+```
+
+- This allows our `CounterComponent` to receive `props.dispatch` which can be used to dispatch actions to the store
+
+```
+function Counter( {count, dispatch }) {
+  return (
+    <div>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}> + </button>
+      <button onClick={() => dispatch({ type: 'RESET' })}> reset </button>
+    </ div>
+  )
+}
+```
+
+### 2. providing a `mapDispatchToProps` parameter
+
+- Why this may be better?
+  - this style of coding is more declarative
+    - the `button` does not need to know about dispatch
+  - you can pass down dispatching logic to unconnected child components
+
+```
+// pass toggleToDo to child component
+// making ToDo able to dispatch the toggleToDo action
+const ToDoList = ({ todos, toggleToDo }) => (
+  <div>
+    {todos.map( todo => (
+      <ToDo toDo={toDo} onClick={toggleToDo} />
+    ))}
+  </div>
+)
+```
+
+- `mapDispatchToProps` can be defined in two forms
+  1. As a function - allows more customization
+  2. As an object - more declarative and easier to use
+
+#### Defining `mapDispatchToProps` as a function
+
+- you can customize the functions that your component receives, and how they dispatch actions
+- two parameters
+  1. `dispatch`
+  2. `ownProps` (optional)
+- `return` a plain object
+
+```
+const mapDispatchToProps = (dispatch) => {
+  return {
+    increment: () => dispatch({ type: 'INCREMENT' }),
+    decrement: () => dispatch({ type: 'DECREMENT' }),
+    reset: () => dispatch({ type: 'RESET' })
+  }
+}
+```
+
+- you can also forward arguments to action creators
+
+```
+const mapDispatchToProps = (dispatch) => {
+  return {
+    // explicitly forward events
+    onClick: event => dispatch(trackClick(event)),
+
+    // implicitly forward events
+    onReceiveImpressions: (...impressions) =>
+      dispatch(trackImpressions(impressions))
+  }
+}
+```
+
+- You can then call these 'dispatches' as props in your connected component
+
+```
+function Counter( {count, increment, decrement, reset }) {
+  return (
+    <div>
+      <button onClick={decrement}> - </button>
+      <button onClick={increment}> + </button>
+      <button onClick={reset}> reset </button>
+    </div>
+  )
+}
+```
+
+#### Defining `mapDispatchToProps` as an Object
+
+- each field of the `mapDispatchtoProps` object is assumed to be an action creator
+
+```
+const mapDispatchToProps = {
+  increment, decrement, reset
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Component);
+```
+
+is equivalent to
+
+```
+const increment = () => ({type: "INCREMENT"});
+const decrement = () => ({type: "DECREMENT"});
+const reset = () => ({type: "RESET"});
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    increment: () => dispatch(increment()),
+    decrement: () => dispatch(decrement()),
+    reset: () => dispatch(reset())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Component);
+```

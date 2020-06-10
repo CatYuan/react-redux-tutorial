@@ -1,9 +1,3 @@
-// import { ADD_ARTICLE } from "./action";
-
-// const initialState = {
-//   articles: [],
-// };
-
 import { ADD_ARTICLE } from "./action";
 
 const initialState = {
