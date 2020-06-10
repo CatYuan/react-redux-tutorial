@@ -26,6 +26,8 @@ Below is a table of contents that outlines my notes regarding Redux and React-Re
   - [Intro to React Redux](#intro-to-react-redux)
   - [Extracting Data with mapStateToProps](#extracting-data-with-mapStateToProps)
   - [Dispatching Actions with mapDispatchToProps](#dispatching-actions-with-mapdispatchtoprops)
+- [Redux Middleware](#redux-middleware)
+  - [General Info](#general-info)
 
 <hr />
 
@@ -263,4 +265,24 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Component);
+```
+
+# Redux Middleware
+
+## General Info
+
+- what is `redux middleware`? - it allows us to intercept an action and modify it before it reaches the reducer
+- `redux middleware` is a function
+  - `next()` is a parameter
+  - `return` another function `next(action)`
+
+```
+function someMiddleware() {
+  return function(next) {
+    return function(action) {
+      // do something
+      return next(action);
+    }
+  }
+}
 ```
